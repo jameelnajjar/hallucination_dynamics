@@ -78,10 +78,10 @@ bash scripts/run_eval.sh --n-answerable 80 --n-adversarial 32 \
     --output-dir results_pilot_n80 --pilot
 ```
 
-Note on the reported sweep: steps 40,000, 100,000, 200,000, 400,000 and
-658,032 were evaluated on the 80-item pilot subset (laptop GPU) and reused;
-the other 19 checkpoints use the 300-item set (cluster CPU node). The paper
-discloses this in Section 4 and marks those rows in the tables.
+All 24 checkpoints in `results/` use the 300-item set. Job 956879 ran 19 of
+them; steps 40,000, 100,000, 200,000, 400,000 and 658,032 were first run on
+the 80-item pilot subset and later re-evaluated on the full set by job 976011
+(`REVISIONS="..." sbatch scripts/run_eval.sh --overwrite`).
 
 Useful flags: `--dry-run` prints the exact commands; `--overwrite` recomputes
 existing checkpoints; `--limit N` caps examples for a smoke test;

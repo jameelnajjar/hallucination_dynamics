@@ -127,6 +127,11 @@ run() {
     fi
 }
 
+FORWARD_ARGS=()
+for arg in "$@"; do
+    [[ "${arg}" == "--slurm" ]] || FORWARD_ARGS+=("${arg}")
+done
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --slurm)           SUBMIT_SLURM=1; shift ;;
@@ -165,7 +170,7 @@ if [[ "${SUBMIT_SLURM}" -eq 1 && -z "${SLURM_JOB_ID:-}" ]]; then
 N_ANSWERABLE="${N_ANSWERABLE}",N_ADVERSARIAL="${N_ADVERSARIAL}",BATCH_SIZE="${BATCH_SIZE}",\
 MAX_NEW_TOKENS="${MAX_NEW_TOKENS}",PROMPT_STYLE="${PROMPT_STYLE}",DEVICE="${DEVICE}",\
 DEVICE_MAP="${DEVICE_MAP}",DTYPE="${DTYPE}",OUTPUT_DIR="${OUTPUT_DIR}" \
-        "${SCRIPT_PATH}"
+        "${SCRIPT_PATH}" "${FORWARD_ARGS[@]}"
     exit $?
 fi
 
