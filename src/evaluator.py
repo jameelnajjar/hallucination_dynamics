@@ -190,6 +190,8 @@ class EvalConfig:
     n_bins: int = 10
     limit: int | None = None
     seed: int = 20252026
+    # 0 means greedy decoding; a positive value samples at that temperature.
+    temperature: float = 0.0
     extra: dict[str, Any] = field(default_factory=dict)
 
     @property
@@ -322,27 +324,34 @@ def _generate_batch(model, tokenizer, prompts: list[str], device: str, cfg: Eval
     enc = {k: v.to(device) for k, v in enc.items()}
     prompt_len = enc["input_ids"].shape[1]
 
+    sampling = cfg.temperature > 0
+    decode_kwargs: dict[str, Any] = (
+        {"do_sample": True, "temperature": cfg.temperature, "top_k": 0, "top_p": 1.0}
+        if sampling else {"do_sample": False}
+    )
     with torch.no_grad():
         out = model.generate(
             **enc,
             max_new_tokens=cfg.max_new_tokens,
-            do_sample=False,
             num_beams=1,
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
             output_scores=True,
+            output_logits=sampling,
             return_dict_in_generate=True,
+            **decode_kwargs,
         )
 
     sequences = out.sequences[:, prompt_len:]  # (B, T_gen)
 
-    # `out.scores` is a T_gen-tuple of (B, V) logit tensors.  With do_sample=False and
-    # no warpers configured these are the raw logits, so a softmax over them is the
-    # true next-token distribution.  We reduce one generation step at a time rather
+    # Under greedy decoding `out.scores` are the raw logits; under sampling they are
+    # temperature-warped, so the unwarped `out.logits` are used instead.  Either way a
+    # softmax gives the model's own next-token distribution.  We reduce one generation step at a time rather
     # than stacking into (B, T_gen, V): with a 100k-token vocabulary that stack would
     # be hundreds of megabytes per batch and is the first thing to OOM on a small GPU.
     entropy_steps, logprob_steps, topprob_steps = [], [], []
-    for t, step_logits in enumerate(out.scores):
+    step_scores = out.logits if sampling else out.scores
+    for t, step_logits in enumerate(step_scores):
         log_probs = torch.log_softmax(step_logits.float(), dim=-1)  # (B, V)
         probs = log_probs.exp()
         entropy_steps.append((-(probs * log_probs).sum(dim=-1)).cpu())  # nats
@@ -618,6 +627,7 @@ def evaluate_checkpoint(cfg: EvalConfig, examples: Sequence[data_mod.Example]) -
             "n_parameters": int(n_params),
             "n_parameters_m": round(n_params / 1e6, 1),
             "seed": cfg.seed,
+            "temperature": cfg.temperature,
             "git_revision": git_revision(),
             "final_batch_size": cfg.extra.get("final_batch_size", {}),
             "dtype_fallback": cfg.extra.get("dtype_fallback"),
@@ -867,6 +877,8 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=RESULTS_DIR)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--seed", type=int, default=20252026)
+    parser.add_argument("--temperature", type=float, default=0.0,
+                        help="0 = greedy decoding; >0 samples at this temperature")
     parser.add_argument("--n-bins", type=int, default=10, help="calibration bins for ECE")
     parser.add_argument("--reaggregate", action="store_true",
                         help="recompute metrics from saved records without loading any model")
@@ -900,6 +912,7 @@ def main() -> int:
         n_bins=args.n_bins,
         limit=args.limit,
         seed=args.seed,
+        temperature=args.temperature,
     )
 
     paths = run_sweep(args.model, checkpoints, cfg, args.output_dir, overwrite=args.overwrite)

@@ -83,6 +83,17 @@ them; steps 40,000, 100,000, 200,000, 400,000 and 658,032 were first run on
 the 80-item pilot subset and later re-evaluated on the full set by job 976011
 (`REVISIONS="..." sbatch scripts/run_eval.sh --overwrite`).
 
+Sampling sensitivity check (Appendix B; jobs 976358-976360, one seed per job):
+
+```bash
+for seed in 1 2 3; do
+  PYTHONPATH=src .venv/bin/python src/evaluator.py --temperature 0.7 --seed ${seed} \
+    --revisions step10000 step70000 step130000 step160000 step200000 step310000 step400000 step658032 \
+    --output-dir results_sampling/t0.7_seed${seed}
+done
+.venv/bin/python scripts/sampling_summary.py --tables-dir report/tables
+```
+
 Useful flags: `--dry-run` prints the exact commands; `--overwrite` recomputes
 existing checkpoints; `--limit N` caps examples for a smoke test;
 `--prompt-style plain_fewshot|zero_shot` switches the template.

@@ -37,6 +37,7 @@
 
 % Numbers below are generated from the evaluation JSON logs by scripts/plot_results.py.
 \input{tables/generated_macros}
+\input{tables/sampling_macros}
 
 \begin{abstract}
 Language models learn facts during pre-training, but they also learn to answer fluently when no answer exists. Both behaviors are usually measured on a finished model, so it is unclear when each one emerges and whether they are related. We evaluate \resNumCheckpoints{} checkpoints of \texttt{\resModelName{}} (\resModelParams{}M parameters) on a paired suite in which every answerable PopQA question has an unanswerable twin, made by a type-violating entity swap, a fictitious name, or a removed subject. Greedy exact match stays near zero while gold-answer NLL falls from \resNLLFirst{} to \resNLLLast{} nats, so knowledge appears in the likelihood before it appears in the output. Hallucination does not decline gradually: the model switches between answering every prompt and abstaining on every prompt, and both regimes copy the few-shot demonstrations. Confidence follows the regime, and unanswerable twins end up slightly more confident than their originals. At this scale, a hallucination rate measures in-context copying rather than knowledge. Code and data are available at \url{https://github.com/jameelnajjar/hallucination_dynamics}.
@@ -53,7 +54,7 @@ Pre-training stores facts in a language model's parameters \citep{petroni2019lam
 \label{fig:acc-hr}
 \end{figure*}
 
-Intermediate checkpoints make this question testable. \citet{biderman2023pythia} released snapshots of models trained on the Pile, and \citet{gottesman2025lment} released LMEnt, a Wikipedia-pretrained family with entity-annotated data and thousands of checkpoints. Prior work with such suites asks how often a fact is recalled. We ask a complementary question: how often does the model name an entity when the prompt has no true answer, and does its confidence register the difference?
+Intermediate checkpoints make this question testable. \citet{biderman2023pythia} released snapshots of models trained on the Pile, and \citet{gottesman2025lment} released LMEnt, a Wikipedia-pretrained family with entity-annotated data and thousands of checkpoints. Prior work with such suites asks how often a fact is recalled. We ask a complementary question: how often does the model name an entity when the prompt has no true answer, and does its confidence register the difference? Our hypothesis was that training passes through a measurable phase in which the model becomes more informative and, at the same time, more confidently wrong on unanswerable prompts.
 
 To answer it we build a paired evaluation set. Each PopQA question \citep{mallen2023popqa}, such as \emph{In what city was Gabriella Di Laccio born?}, gets one unanswerable twin with the subject replaced: \emph{In what city was Klowyn Merivik born?} The twin keeps the relation and the subject's popularity, so any difference in behavior comes from answerability rather than from a shift in the questions. We evaluate \resNumCheckpoints{} checkpoints of a \resModelParams{}M LMEnt model with one fixed few-shot prompt that demonstrates abstention with \texttt{Unknown}.
 
@@ -121,7 +122,7 @@ Confidence is the length-normalised probability of the generated answer \citep{k
 \subsection{Setup}
 \label{sec:setup}
 
-We evaluate \texttt{\resModelName{}} (\resModelParams{}M parameters) at \resNumCheckpoints{} checkpoints: every 30k steps from step~\resFirstStep{} to step~640{,}000, plus step~200{,}000 and the final step~\resLastStep{}, each on all \resNumAnswerable{} pairs and \resNumAdversarial{} TruthfulQA questions. Decoding is greedy in float32 with at most 16 new tokens, using Hugging Face \texttt{transformers}. Code, data and the commands behind every number are at \url{https://github.com/jameelnajjar/hallucination_dynamics}.
+We evaluate \texttt{\resModelName{}} (\resModelParams{}M parameters) at \resNumCheckpoints{} checkpoints: every 30k steps from step~\resFirstStep{} to step~640{,}000, plus step~200{,}000 and the final step~\resLastStep{}, each on all \resNumAnswerable{} pairs and \resNumAdversarial{} TruthfulQA questions. Decoding is greedy in float32 with at most 16 new tokens, using Hugging Face \texttt{transformers}; as a sensitivity check, the eight checkpoints of Table~\ref{tab:main} are also decoded by sampling at temperature \resSampTemperature{} with \resSampNumSeeds{} seeds. Code, data and the commands behind every number are at \url{https://github.com/jameelnajjar/hallucination_dynamics}.
 
 As a reference point we use the trivial always-abstain baseline, which outputs \texttt{Unknown} for every question. It scores HR $=0$ and EM $=0$, with selectivity $0$. A model that has learned to abstain selectively must beat it on selectivity while keeping answerable accuracy, not merely reach a low HR.
 
@@ -153,6 +154,8 @@ A model learning to answer only when it knows would hallucinate less on twins as
 \end{figure*}
 
 After onset the model switches between regimes rather than moving gradually. Mean broad HR is \resHRMeanAsserting{} in asserting checkpoints and \resHRMeanAbstaining{} in abstaining ones, and answerable questions follow the same pattern. Selectivity is below $0.05$ at 20 of \resNumCheckpoints{} checkpoints, so abstaining checkpoints behave like the always-abstain baseline rather than like a selective model. The maximum selectivity, \resMaxSelectivity{} at step~\resSelMaxStep{}, occurs at a mixed checkpoint on a regime boundary and does not persist. The negative trend of HR against training step (Spearman $\rho=\resRhoHRStep{}$) only reflects that later checkpoints fall in the abstaining regime.
+
+Sampling softens the regimes but does not create selectivity (Appendix~\ref{app:full}, Table~\ref{tab:sampling}). At abstaining checkpoints, sampled outputs leave \texttt{Unknown} on answerable and unanswerable prompts alike, and sampled selectivity is at most \resSampSelMax{} at every checkpoint, so the greedy maximum at step~\resSelMaxStep{} is partly a decoding effect. Seed-to-seed standard deviations of HR are at most \resSampHRSDMax{}.
 
 \begin{table}[t]
 \centering
@@ -204,11 +207,11 @@ Either way, the results suggest a reporting practice for hallucination studies o
 
 \section{Conclusion}
 
-We tracked two abilities across pre-training: storing a fact and refraining from inventing one. A \resModelParams{}M LMEnt model improves steadily on the first, measured by gold-answer likelihood, while its greedy output never becomes selective. Hallucination sets in at step~\resOnsetStep{}, and afterwards the model switches between answering everything and abstaining on everything, in both cases by copying the demonstrations. Mitigations such as retrieval \citep{lewis2020rag} therefore target a behavior that, at this scale, is present as soon as the model produces well-formed text. Natural next steps are larger LMEnt models and tracing individual facts back to their pre-training mentions.
+We tracked two abilities across pre-training: storing a fact and refraining from inventing one. A \resModelParams{}M LMEnt model improves steadily on the first, measured by gold-answer likelihood, while its greedy output never becomes selective. Hallucination sets in at step~\resOnsetStep{}, and afterwards the model switches between answering everything and abstaining on everything, in both cases by copying the demonstrations. The hypothesised phase therefore does not exist at this scale: the model becomes more informative gradually, but it is wrong on unanswerable prompts from the first checkpoint on, and its confidence never separates them from answerable ones. Mitigations such as retrieval \citep{lewis2020rag} therefore target a behavior that, at this scale, is present as soon as the model produces well-formed text. Natural next steps are larger LMEnt models and tracing individual facts back to their pre-training mentions.
 
 \section*{Limitations}
 
-The model is small, the generation budget is short, and the sample is modest (300 pairs per checkpoint), so intermediate rates carry wide intervals. We report greedy decoding only; sampling with several seeds would show more varied fabrications. The abstention, echo and error-category detectors are surface heuristics, so the error categories are upper bounds that we checked by hand on a sample. Entity-swap unanswerability is linguistic rather than absolute: a stronger model could invent a fictional reading in which a mountain has a screenwriter. A ten-bin ECE on 300 questions is noisy, and the reliability diagrams in Appendix~\ref{app:full} are more informative than the single number.
+The model is small, the generation budget is short, and the sample is modest (300 pairs per checkpoint), so intermediate rates carry wide intervals. Sampling was run at one temperature and on eight checkpoints only. The abstention, echo and error-category detectors are surface heuristics, so the error categories are upper bounds that we checked by hand on a sample. Entity-swap unanswerability is linguistic rather than absolute: a stronger model could invent a fictional reading in which a mountain has a screenwriter. A ten-bin ECE on 300 questions is noisy, and the reliability diagrams in Appendix~\ref{app:full} are more informative than the single number.
 
 \section*{AI Disclosure and Reflection}
 
@@ -279,7 +282,7 @@ A useful format would raise abstention on twins more than on originals, so forma
 \section{Full Checkpoint Results}
 \label{app:full}
 
-Table~\ref{tab:main-full} lists all \resNumCheckpoints{} checkpoints, including mean token entropy, and Table~\ref{tab:cal} the full calibration results. Figure~\ref{fig:reliability} shows reliability diagrams, Figure~\ref{fig:cal-auroc} plots ECE, AUROC and confidence across training, and Table~\ref{tab:popularity} breaks results down by subject popularity.
+Table~\ref{tab:main-full} lists all \resNumCheckpoints{} checkpoints, including mean token entropy, Table~\ref{tab:sampling} compares greedy decoding with sampling, and Table~\ref{tab:cal} gives the full calibration results. Figure~\ref{fig:reliability} shows reliability diagrams, Figure~\ref{fig:cal-auroc} plots ECE, AUROC and confidence across training, and Table~\ref{tab:popularity} breaks results down by subject popularity.
 
 \begin{table}[h]
 \centering
@@ -298,6 +301,14 @@ Table~\ref{tab:main-full} lists all \resNumCheckpoints{} checkpoints, including 
 }
 \caption{All \resNumCheckpoints{} checkpoints (columns as in Table~\ref{tab:main}).}
 \label{tab:main-full}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\small
+\input{tables/sampling_results}
+\caption{Sampling sensitivity check: greedy decoding versus sampling at temperature \resSampTemperature{} (mean $\pm$ standard deviation over \resSampNumSeeds{} seeds) at the checkpoints of Table~\ref{tab:main}. HR is on unanswerable twins; selectivity is abstention on twins minus abstention on originals.}
+\label{tab:sampling}
 \end{table*}
 
 \begin{table*}[t]
