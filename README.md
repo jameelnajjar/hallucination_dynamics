@@ -15,6 +15,7 @@ paired suite: answerable PopQA questions, an unanswerable twin for each one
 TruthfulQA split. At every checkpoint we log exact match, token F1, gold-answer
 NLL, broad and entity-level hallucination rate, question echoes, abstention,
 token entropy, ECE and AUROC. The paper is `report/main.pdf`.
+Code and data: https://github.com/jameelnajjar/hallucination_dynamics
 
 ## Repository layout
 
