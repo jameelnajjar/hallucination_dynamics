@@ -1,0 +1,11 @@
+# Shell scripts and the sourced .env must keep LF endings: bash on the cluster
+# rejects CRLF ("syntax error near unexpected token `elif'").
+*.sh      text eol=lf
+.env      text eol=lf
+*.py      text eol=lf
+*.tex     text eol=lf
+*.bib     text eol=lf
+*.ps1     text eol=crlf
+*.json    text
+*.pdf     binary
+*.png     binary

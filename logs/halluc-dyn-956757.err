@@ -1,0 +1,10 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Repo card metadata block was not found. Setting CardData to empty.
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights:   7%|▋         | 10/148 [00:00<00:01, 93.20it/s]Loading weights:  18%|█▊        | 26/148 [00:00<00:01, 114.09it/s]Loading weights:  26%|██▌       | 38/148 [00:00<00:00, 115.28it/s]Loading weights:  45%|████▍     | 66/148 [00:00<00:00, 165.69it/s]Loading weights:  60%|██████    | 89/148 [00:00<00:00, 179.58it/s]Loading weights:  72%|███████▏  | 107/148 [00:00<00:00, 139.65it/s]Loading weights:  82%|████████▏ | 122/148 [00:00<00:00, 118.49it/s]Loading weights: 100%|██████████| 148/148 [00:00<00:00, 157.36it/s]
+/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/cuda/__init__.py:228: UserWarning: CUDA initialization: CUDA unknown error - this may be due to an incorrectly set up environment, e.g. changing env variable CUDA_VISIBLE_DEVICES after program start. Setting the available devices to be zero. (Triggered internally at /__w/pytorch/pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Repo card metadata block was not found. Setting CardData to empty.

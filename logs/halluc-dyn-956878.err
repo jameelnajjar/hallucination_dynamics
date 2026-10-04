@@ -1,0 +1,5 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Repo card metadata block was not found. Setting CardData to empty.
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights:  18%|█▊        | 27/148 [00:00<00:00, 220.90it/s]Loading weights:  35%|███▌      | 52/148 [00:00<00:00, 216.28it/s]Loading weights:  55%|█████▍    | 81/148 [00:00<00:00, 176.79it/s]Loading weights:  71%|███████   | 105/148 [00:00<00:00, 191.22it/s]Loading weights:  85%|████████▌ | 126/148 [00:00<00:00, 184.53it/s]Loading weights: 100%|██████████| 148/148 [00:00<00:00, 203.47it/s]
+/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/cuda/__init__.py:228: UserWarning: CUDA initialization: CUDA unknown error - this may be due to an incorrectly set up environment, e.g. changing env variable CUDA_VISIBLE_DEVICES after program start. Setting the available devices to be zero. (Triggered internally at /__w/pytorch/pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0

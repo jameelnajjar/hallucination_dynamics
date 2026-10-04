@@ -1,0 +1,98 @@
+{
+  "model": "dhgottesman/LMEnt-170M-6E",
+  "checkpoint": "step658032",
+  "n": 40,
+  "device": "cuda",
+  "dtype": "float32",
+  "results": {
+    "plain_fewshot": {
+      "exact_match": 0.0,
+      "substring_f1": 0.0,
+      "abstention_answerable": 0.0,
+      "abstention_unanswerable": 0.0,
+      "selectivity": 0.0,
+      "hallucination_rate": 1.0,
+      "sample_answerable": [
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Blue Danube?"
+      ],
+      "sample_unanswerable": [
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Blue Danube?"
+      ]
+    },
+    "abstain_3_3": {
+      "exact_match": 0.0,
+      "substring_f1": 0.016666666666666666,
+      "abstention_answerable": 0.975,
+      "abstention_unanswerable": 1.0,
+      "selectivity": 0.025000000000000022,
+      "hallucination_rate": 0.0,
+      "sample_answerable": [
+        "Unknown",
+        "Unknown",
+        "Unknown",
+        "Unknown",
+        "Unknown"
+      ],
+      "sample_unanswerable": [
+        "Unknown",
+        "Unknown",
+        "Unknown",
+        "Unknown",
+        "Unknown"
+      ]
+    },
+    "abstain_4_2": {
+      "exact_match": 0.0,
+      "substring_f1": 0.026666666666666665,
+      "abstention_answerable": 0.05,
+      "abstention_unanswerable": 0.05,
+      "selectivity": 0.0,
+      "hallucination_rate": 0.95,
+      "sample_answerable": [
+        "Coyoacan",
+        "Coyoacán",
+        "Coyoacan",
+        "Coyoacán",
+        "Coyoacán"
+      ],
+      "sample_unanswerable": [
+        "Coyoacán",
+        "Coyoacán",
+        "Coyoacan",
+        "Unknown",
+        "Coyoacan"
+      ]
+    },
+    "abstain_5_1": {
+      "exact_match": 0.0,
+      "substring_f1": 0.05928571428571429,
+      "abstention_answerable": 0.0,
+      "abstention_unanswerable": 0.0,
+      "selectivity": 0.0,
+      "hallucination_rate": 1.0,
+      "sample_answerable": [
+        "The Blue Danube?",
+        "The Icelandic capital of Reykjavík",
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Mother of the Nation?"
+      ],
+      "sample_unanswerable": [
+        "The French Revolution?",
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Blue Danube?",
+        "The Mother of the World?"
+      ]
+    }
+  },
+  "selected": "abstain_3_3"
+}

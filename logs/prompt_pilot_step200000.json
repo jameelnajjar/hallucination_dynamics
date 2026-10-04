@@ -1,0 +1,98 @@
+{
+  "model": "dhgottesman/LMEnt-170M-6E",
+  "checkpoint": "step200000",
+  "n": 40,
+  "device": "cuda",
+  "dtype": "float32",
+  "results": {
+    "plain_fewshot": {
+      "exact_match": 0.0,
+      "substring_f1": 0.06541666666666666,
+      "abstention_answerable": 0.0,
+      "abstention_unanswerable": 0.0,
+      "selectivity": 0.0,
+      "hallucination_rate": 1.0,
+      "sample_answerable": [
+        "What is the way of the woman?",
+        "What is the capital of the United States?",
+        "What is the city of Paris?",
+        "What is the way of the world?",
+        "What is the way of the world?"
+      ],
+      "sample_unanswerable": [
+        "The Blue Danube?",
+        "What is the capital of Vianass?",
+        "What is the color?",
+        "What is the way of the world?",
+        "What is the language of the world?"
+      ]
+    },
+    "abstain_3_3": {
+      "exact_match": 0.0,
+      "substring_f1": 0.06755952380952382,
+      "abstention_answerable": 0.0,
+      "abstention_unanswerable": 0.0,
+      "selectivity": 0.0,
+      "hallucination_rate": 1.0,
+      "sample_answerable": [
+        "What is the capital of Zanmir?",
+        "What is the capital of the United States?",
+        "What is the capital of Zanmir?",
+        "What is the capital of Zanmir?",
+        "What is the capital of Zanmir?"
+      ],
+      "sample_unanswerable": [
+        "What is the capital of Zanmir?",
+        "What is the capital of Vianass?",
+        "What is the capital of Zanmir?",
+        "What is the capital of Zanmir?",
+        "What is the capital of Zanmir?"
+      ]
+    },
+    "abstain_4_2": {
+      "exact_match": 0.0,
+      "substring_f1": 0.07242063492063491,
+      "abstention_answerable": 0.0,
+      "abstention_unanswerable": 0.0,
+      "selectivity": 0.0,
+      "hallucination_rate": 1.0,
+      "sample_answerable": [
+        "What is the capital of Zanmir?",
+        "What is the capital of Iceland?",
+        "What is the city of London?",
+        "What is the capital of Zanmir?",
+        "What is the mother of Franklin Richards?"
+      ],
+      "sample_unanswerable": [
+        "What is the capital of Zanmir?",
+        "What is the capital of Vianass?",
+        "What is the capital of Zanmir?",
+        "What is the capital of Zanmir?",
+        "What is the mother of Grerk Vatamir?"
+      ]
+    },
+    "abstain_5_1": {
+      "exact_match": 0.0,
+      "substring_f1": 0.05843253968253968,
+      "abstention_answerable": 0.0,
+      "abstention_unanswerable": 0.0,
+      "selectivity": 0.0,
+      "hallucination_rate": 1.0,
+      "sample_answerable": [
+        "What is the way of the woman?",
+        "What is the capital of Iceland?",
+        "What is the city of Paris?",
+        "What is the name of the city?",
+        "What is the name of the city?"
+      ],
+      "sample_unanswerable": [
+        "What is the city of Paris?",
+        "What is the capital of Vianass?",
+        "What is the color?",
+        "What is the city of Paris?",
+        "What is the name of the city?"
+      ]
+    }
+  },
+  "selected": "abstain_4_2"
+}

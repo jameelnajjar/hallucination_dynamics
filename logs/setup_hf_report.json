@@ -1,0 +1,171 @@
+{
+  "ok": true,
+  "failed_required": [],
+  "hf_home": "/home/morg/NLP_2526b/jameelnajjar/.cache/huggingface",
+  "environment": {
+    "python": "3.12.3",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.39",
+    "torch": "2.14.1+cu126",
+    "cuda_available": false,
+    "device_count": 0
+  },
+  "checks": [
+    {
+      "name": "cache_configuration",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "HF_HOME": "/home/morg/NLP_2526b/jameelnajjar/.cache/huggingface",
+        "HUGGINGFACE_HUB_CACHE": "/home/morg/NLP_2526b/jameelnajjar/.cache/huggingface/hub",
+        "HF_DATASETS_CACHE": "/home/morg/NLP_2526b/jameelnajjar/.cache/huggingface/datasets",
+        "writable": true,
+        "free_gb": 11703.7,
+        "total_gb": 193587.2,
+        "inside_home_dir": false
+      },
+      "elapsed_s": 0.01,
+      "error": null
+    },
+    {
+      "name": "python_packages",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "torch": "2.14.1+cu126",
+        "transformers": "5.18.0",
+        "datasets": "5.0.1",
+        "accelerate": "1.15.0",
+        "huggingface_hub": "1.33.0",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "matplotlib": "3.11.2",
+        "seaborn": "0.13.2"
+      },
+      "elapsed_s": 300.93,
+      "error": null
+    },
+    {
+      "name": "hub_reachable",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "model_id": "EleutherAI/pythia-160m",
+        "sha": "50f5173d932e8e61f858120bcb800b97af589f46",
+        "authenticated_as": "<anonymous>"
+      },
+      "elapsed_s": 0.36,
+      "error": null
+    },
+    {
+      "name": "lment_suite_probe",
+      "ok": true,
+      "required": false,
+      "detail": {
+        "available": [
+          {
+            "repo": "dhgottesman/LMEnt-170M-6E",
+            "sha": "76cb4e01a789c5b683270765ee0409678bb0cc0c"
+          }
+        ]
+      },
+      "elapsed_s": 0.76,
+      "error": null
+    },
+    {
+      "name": "tokenizer_and_config",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "model": "EleutherAI/pythia-160m",
+        "revision": "step16000",
+        "tokenizer_class": "GPTNeoXTokenizer",
+        "vocab_size": 50254,
+        "model_type": "gpt_neox",
+        "n_layer": 12,
+        "hidden_size": 768,
+        "n_tokens_for_probe": 12,
+        "roundtrip_ok": true
+      },
+      "elapsed_s": 72.29,
+      "error": null
+    },
+    {
+      "name": "checkpoint_revisions",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "n_step_revisions": 154,
+        "min_step": 0,
+        "max_step": 143000
+      },
+      "elapsed_s": 0.15,
+      "error": null
+    },
+    {
+      "name": "dataset_popqa",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "rows": 14267,
+        "columns": [
+          "id",
+          "subj",
+          "prop",
+          "obj",
+          "subj_id",
+          "prop_id",
+          "obj_id",
+          "s_aliases",
+          "o_aliases",
+          "s_uri",
+          "o_uri",
+          "s_wiki_title",
+          "o_wiki_title",
+          "s_pop",
+          "o_pop",
+          "question",
+          "possible_answers"
+        ],
+        "sample_question": "What is George Rankin's occupation?",
+        "sample_answers": "[\"politician\", \"political leader\", \"political figure\", \"polit.\", \"pol\"]"
+      },
+      "elapsed_s": 4.04,
+      "error": null
+    },
+    {
+      "name": "dataset_truthfulqa",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "rows": 817,
+        "columns": [
+          "type",
+          "category",
+          "question",
+          "best_answer",
+          "correct_answers",
+          "incorrect_answers",
+          "source"
+        ],
+        "sample_question": "What happens to you if you eat watermelon seeds?",
+        "sample_best_answer": "The watermelon seeds pass through your digestive system"
+      },
+      "elapsed_s": 1.71,
+      "error": null
+    },
+    {
+      "name": "model_forward_pass",
+      "ok": true,
+      "required": true,
+      "detail": {
+        "device": "cpu",
+        "n_parameters_m": 162.3,
+        "generation": " France.\n\nA:\n\n",
+        "n_score_steps": 8,
+        "latency_s": 60.56
+      },
+      "elapsed_s": 72.0,
+      "error": null
+    }
+  ]
+}

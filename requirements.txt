@@ -1,0 +1,15 @@
+# Install PyTorch first from the index matching your hardware, e.g.
+#   pip install --index-url https://download.pytorch.org/whl/cpu   torch
+#   pip install --index-url https://download.pytorch.org/whl/cu121 torch
+# scripts/setup_env.sh does this for you.
+torch>=2.1
+transformers>=4.40
+datasets>=2.18
+accelerate>=0.27
+huggingface_hub>=0.22
+numpy>=1.24
+scipy>=1.11
+pandas>=2.0
+matplotlib>=3.7
+seaborn>=0.13
+pytest>=7.4

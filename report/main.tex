@@ -1,0 +1,358 @@
+\documentclass[11pt]{article}
+
+% Official *ACL two-column style (acl-org/acl-style-files).
+\usepackage[preprint]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{xcolor}
+
+\title{Knowledge and Hallucinations in Language Models Across Training Dynamics}
+
+\author{Muhammad Abu-Fanni \\
+  Tel Aviv University \\
+  ID 324823095 \\
+  {\small\texttt{abufanni@mail.tau.ac.il}}
+  \And
+  Jameel Najjar \\
+  Tel Aviv University \\
+  ID 213727837 \\
+  {\small\texttt{jameelnajjar@mail.tau.ac.il}}
+  \And
+  Antonella Campania \\
+  Tel Aviv University \\
+  ID 214497109 \\
+  {\small\texttt{antonella@mail.tau.ac.il}}}
+
+\begin{document}
+\maketitle
+
+% Numbers below are generated from the evaluation JSON logs by scripts/plot_results.py.
+\input{tables/generated_macros}
+
+\begin{abstract}
+Language models learn facts during pre-training, but they also learn to answer fluently when no answer exists. Both behaviors are usually measured on a finished model, so it is unclear when each one emerges and whether they are related. We evaluate \resNumCheckpoints{} checkpoints of \texttt{\resModelName{}} (\resModelParams{}M parameters) on a paired suite in which every answerable PopQA question has an unanswerable twin, made by a type-violating entity swap, a fictitious name, or a removed subject. Greedy exact match stays near zero while gold-answer NLL falls from \resNLLFirst{} to \resNLLLast{} nats, so knowledge appears in the likelihood before it appears in the output. Hallucination does not decline gradually: the model switches between answering every prompt and abstaining on every prompt, and both regimes copy the few-shot demonstrations. Confidence follows the regime, and unanswerable twins end up slightly more confident than their originals. At this scale, a hallucination rate measures in-context copying rather than knowledge.
+\end{abstract}
+
+\section{Introduction}
+
+Pre-training stores facts in a language model's parameters \citep{petroni2019lama,roberts2020knowledge}. The same training also produces models that answer questions they cannot know the answer to \citep{ji2023survey,lin2022truthfulqa}. Both behaviors are normally measured on the final checkpoint, which hides their timing: does the model start inventing answers before it can recall facts, at the same time, or instead of recalling them? Knowing the order matters for interpreting hallucination benchmarks, and for deciding whether hallucination is a late side effect of training or present from the start.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{../plots/fig1_accuracy_vs_hallucination.pdf}
+\caption{Main result. Left: greedy accuracy on answerable PopQA stays near floor across all \resNumCheckpoints{} checkpoints. Right: on the unanswerable twins, the broad hallucination rate, its entity-level subset, question echoes, and abstention. The model switches between answering everything and abstaining on everything instead of learning to abstain selectively.}
+\label{fig:acc-hr}
+\end{figure*}
+
+Intermediate checkpoints make this question testable. \citet{biderman2023pythia} released snapshots of models trained on the Pile, and \citet{gottesman2025lment} released LMEnt, a Wikipedia-pretrained family with entity-annotated data and thousands of checkpoints. Prior work with such suites asks how often a fact is recalled. We ask a complementary question: how often does the model name an entity when the prompt has no true answer, and does its confidence register the difference?
+
+To answer it we build a paired evaluation set. Each PopQA question \citep{mallen2023popqa}, such as \emph{In what city was Gabriella Di Laccio born?}, gets one unanswerable twin with the subject replaced: \emph{In what city was Klowyn Merivik born?} The twin keeps the relation and the subject's popularity, so any difference in behavior comes from answerability rather than from a shift in the questions. We evaluate \resNumCheckpoints{} checkpoints of a \resModelParams{}M LMEnt model with one fixed few-shot prompt that demonstrates abstention with \texttt{Unknown}.
+
+Figure~\ref{fig:acc-hr} summarises the outcome. Greedy exact match stays near floor (best \resEMBest{}), as expected for a small model on PopQA's long tail \citep{mallen2023popqa}, but gold-answer NLL improves from \resNLLFirst{} to \resNLLLast{} nats. Hallucination sets in at step~\resOnsetStep{} and never declines gradually. Instead, the model switches between two regimes, answering most unanswerable prompts at \resNumAssertingCkpts{} checkpoints and emitting \texttt{Unknown} on answerable and unanswerable prompts alike at \resNumAbstainingCkpts{}. A prompt-format pilot and an error analysis show that both regimes are in-context copying of the demonstrations, and confidence follows the regime rather than the question.
+
+The parameters storing a fact and the decoder refraining from inventing one are therefore separate properties, and at this scale only the first one improves with training. For small base models, a hallucination rate is only interpretable next to the paired answerable rate and a prompt-format check.
+
+\section{Related Work}
+
+\paragraph{Knowledge in language models.}
+\citet{petroni2019lama} showed that language models answer cloze queries about the world, and \citet{roberts2020knowledge} showed that the same knowledge can be extracted generatively. Later work located factual associations in model weights \citep{geva2023dissecting} and traced how facts are acquired during pre-training \citep{chang2024dynamics}. \citet{mallen2023popqa} found that long-tail entities are recalled far less reliably than popular ones. LMEnt \citep{gottesman2025lment} is the closest prior work, providing entity-annotated pre-training data and checkpoints. These studies measure what a model knows; we measure what it does when there is nothing to know.
+
+\paragraph{Hallucination.}
+The term is used in several ways \citep{ji2023survey}. Following \citet{maynez2020faithfulness}, we restrict it to intrinsic fabrication: a contentful answer that cannot be correct because the prompt has no answer. This differs from the imitative falsehoods targeted by TruthfulQA \citep{lin2022truthfulqa}. \citet{gekhman2024finetune} showed that fine-tuning on unknown facts increases hallucination. That work studies fine-tuning; we study how fabrication develops during pre-training.
+
+\paragraph{Calibration.}
+A model is calibrated when its confidence matches its accuracy \citep{naeini2015ece,guo2017calibration}, and pre-trained transformers are often poorly calibrated \citep{desai2020calibration}. \citet{kadavath2022know} and \citet{yin2023unknown} ask whether models know what they do not know, using finished models. Semantic entropy \citep{farquhar2024detecting} detects hallucination better than token probabilities but requires many samples per question, which is too costly for a dense checkpoint sweep. We use token-level confidence and ask when along training it starts, or fails, to separate answerable from unanswerable questions.
+
+\section{Method}
+
+We evaluate open-ended short-form question answering. A checkpoint receives a fixed few-shot prompt ending in a question and \texttt{Answer:}, and is decoded greedily. On an answerable question the target is a gold alias; on an unanswerable one it is the abstention \texttt{Unknown}. Section~\ref{sec:data} describes the paired data, Section~\ref{sec:prompt} the prompt, and Section~\ref{sec:metrics} the metrics.
+
+\subsection{Paired dataset}
+\label{sec:data}
+
+PopQA \citep{mallen2023popqa} contains 14k Wikidata-grounded questions over 16 relations, with subject popularity and object aliases. We keep questions whose subject appears verbatim in the text and draw a stratified sample of 300 (18--19 per relation).
+
+Each answerable question gets exactly one unanswerable twin, cycling through three perturbations, 100 of each (Table~\ref{tab:examples}). A \emph{type-violating swap} substitutes a real entity of an incompatible type. A \emph{fictitious entity} substitutes a plausible name generated from a syllable grammar and checked against all gold answers. A \emph{context-deprived} twin substitutes a bare description such as \emph{that work}. Pairing is deterministic given a fixed seed, which allows a paired test on confidence. We also include 120 TruthfulQA generation questions \citep{lin2022truthfulqa}, scored against both the correct and the listed incorrect answers. Appendix~\ref{app:details} gives the construction details.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\columnwidth}>{\raggedright\arraybackslash}p{0.68\columnwidth}@{}}
+\toprule
+Perturbation & Original $\rightarrow$ twin \\
+\midrule
+Type-violating swap & Who was the screenwriter for \emph{Thursday}? \\
+ & $\rightarrow$ \ldots for \emph{Sugar Loaf Mountain}? \\
+Fictitious entity & In what city was \emph{Gabriella Di Laccio} born? \\
+ & $\rightarrow$ \ldots was \emph{Klowyn Merivik} born? \\
+Context-deprived & Who was the composer of \emph{Happy Birthday to You}? \\
+ & $\rightarrow$ \ldots composer of \emph{that work}? \\
+\bottomrule
+\end{tabular}
+\caption{One answerable/unanswerable pair per perturbation, taken from the evaluation set. Gold answers of the originals: Skip Woods, Porto Alegre, Mildred J.\ Hill. The target for every twin is \texttt{Unknown}.}
+\label{tab:examples}
+\end{table}
+
+\subsection{Prompt}
+\label{sec:prompt}
+
+The prompt has six hand-written demonstrations, alternating factual answers and \texttt{Unknown}, and an instruction to answer \texttt{Unknown} when a question cannot be answered (Appendix~\ref{app:prompts}). It is identical at every checkpoint, so differences between checkpoints come from training rather than from the prompt.
+
+\subsection{Metrics}
+\label{sec:metrics}
+
+Only the first generated line is scored, because base models otherwise continue into a self-generated dialogue. For answerable questions we report exact match and token $F_1$ with SQuAD normalisation \citep{rajpurkar2016squad}, and the teacher-forced negative log-likelihood of the gold answer (gold NLL), which measures recall even when greedy decoding misses the gold string.
+
+For unanswerable questions, the broad hallucination rate (HR) is the share of completions that are contentful and not an abstention. Base models often fill the answer slot with a copied question (\emph{What is the capital of Zanmir?}), so we also report the question-echo rate and the entity hallucination rate (EHR), which excludes echoes. EHR counts plausible-looking answers to questions that have none; the difference $\mathrm{HR}-\mathrm{EHR}$ is a format failure. Selectivity is abstention on twins minus abstention on originals.
+
+Confidence is the length-normalised probability of the generated answer \citep{kadavath2022know}, and we also record mean token entropy. ECE is the 10-bin gap between confidence and accuracy \citep{naeini2015ece,guo2017calibration}. AUROC of confidence is reported for separating an original from its twin (pair AUROC) and for flagging fabrications. The onset of a rate is the first trained step at which it is at least \resOnsetThreshold{} at that checkpoint and the next one, so a single spike does not count. Formal definitions are in Appendix~\ref{app:details}.
+
+\section{Experiments}
+
+\subsection{Setup}
+\label{sec:setup}
+
+We evaluate \texttt{\resModelName{}} (\resModelParams{}M parameters) at \resNumCheckpoints{} checkpoints: every 30k steps from step~\resFirstStep{} to step~640{,}000, plus step~200{,}000 and the final step~\resLastStep{}. Nineteen checkpoints use the full set (300 pairs and 120 TruthfulQA questions); five (steps 40k, 100k, 200k, 400k and 658{,}032) use a nested 80-pair subset with 32 TruthfulQA questions, so their confidence intervals are about twice as wide. Decoding is greedy in float32 with at most 16 new tokens, using Hugging Face \texttt{transformers}; the repository README lists the commands behind every number.
+
+As a reference point we use the trivial always-abstain baseline, which outputs \texttt{Unknown} for every question. It scores HR $=0$ and EM $=0$, with selectivity $0$. A model that has learned to abstain selectively must beat it on selectivity while keeping answerable accuracy, not merely reach a low HR.
+
+\begin{table*}[t]
+\centering
+\small
+\input{tables/main_results}
+\caption{Eight representative checkpoints: onset (10k), abstention onset (70k), asserting (130k, 200k), mixed (160k, 310k), collapsed abstention (400k), and final. EM, $F_1$, gold-answer NLL (nats) and abstention rate (AR) on answerable PopQA; broad hallucination rate (HR), entity-hallucination rate (EHR), question-echo rate and AR on the unanswerable twins; ECE and mean token entropy $H$ on answerable questions. HR $=$ EHR $+$ Echo up to rounding. Steps 200k, 400k and 658{,}032 use the 80-pair subset. All \resNumCheckpoints{} checkpoints are in Appendix~\ref{app:full}.}
+\label{tab:main}
+\end{table*}
+
+\subsection{Greedy recall is near floor; likelihood is not}
+
+Exact match is $\resEMFirst{}$ at the first and last checkpoints, with a best value of $\resEMBest{}$ (Table~\ref{tab:main}). Token $F_1$ peaks at \resFOneBest{} in answering checkpoints and collapses when the model outputs \texttt{Unknown}. A \resModelParams{}M Wikipedia-pretrained model is not a closed-book QA system on PopQA's long tail \citep{mallen2023popqa,gottesman2025lment}.
+
+Gold-answer NLL is more informative: it falls from \resNLLFirst{} to \resNLLLast{} nats. The exception is step $400{,}000$, where NLL rises to $9.36$ and greedy decoding collapses onto a sharply peaked \texttt{Unknown} (entropy $0.61$). Exact match alone therefore understates the knowledge already present in the parameters.
+
+TruthfulQA shows no imitative-falsehood problem at this scale. Completions match a listed incorrect answer at a rate of \resFalsehoodMean{} on average (\resFalsehoodLast{} at the last checkpoint), and matches with the correct answers are equally rare. TruthfulQA abstention follows the same regime switch as PopQA, from below $0.05$ in asserting checkpoints to $0.71$--$1.00$ in abstaining ones.
+
+\subsection{Two decoding regimes, not selective abstention}
+
+A model learning to answer only when it knows would hallucinate less on twins as its likelihood improves, and would abstain more on twins than on originals. Neither happens. Broad HR first stays above \resOnsetThreshold{} at step~\resOnsetStep{}, and abstention at step~\resOnsetAbstentionStep{} (Figure~\ref{fig:onset}). EHR peaks at \resEHRPeak{} at step~\resEHRPeakStep{} and has fallen by step~\resOffsetEntityStep{}, so it never meets the onset rule.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{../plots/fig6_onset_phase.pdf}
+\caption{Left: broad HR, entity-level EHR, unanswerable abstention and answerable substring accuracy, with the sustained-crossing onset marked. Right: trajectory through (substring accuracy, HR) space, coloured by training step; the model jumps between corners instead of moving toward high accuracy and low HR.}
+\label{fig:onset}
+\end{figure*}
+
+After onset the model switches between regimes rather than moving gradually. Mean broad HR is \resHRMeanAsserting{} in asserting checkpoints and \resHRMeanAbstaining{} in abstaining ones, and answerable questions follow the same pattern. Selectivity is below $0.05$ at 21 of \resNumCheckpoints{} checkpoints, so abstaining checkpoints behave like the always-abstain baseline rather than like a selective model. The maximum selectivity, \resMaxSelectivity{} at step~\resSelMaxStep{}, occurs at a mixed checkpoint on a regime boundary and does not persist. The negative trend of HR against training step (Spearman $\rho=\resRhoHRStep{}$) only reflects that later checkpoints fall in the abstaining regime.
+
+\begin{table}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\input{tables/perturbation_results}
+}
+\caption{Broad hallucination rate by perturbation type at the checkpoints of Table~\ref{tab:main}.}
+\label{tab:perturb}
+\end{table}
+
+The three perturbation types usually move together (Table~\ref{tab:perturb}). The exception is step $310{,}000$, where context-deprived twins are refused far more often (HR $0.21$) than swaps ($0.82$) or fictitious names ($0.74$). Those twins share the form of an abstention demonstration (\emph{In what city was that person born?} $\rightarrow$ \texttt{Unknown}), so the exception is explained by copying rather than by detection of category errors.
+
+\subsection{Both regimes are in-context copying}
+\label{sec:copy}
+
+At step~\resFirstStep{}, \resEHRFirst{} of unanswerable completions are assertions, but not answers to the question: nearly half of the 300 twins, and their originals, receive \emph{The French Revolution} or \emph{The Story of the French Revolution} whatever the relation. Later the answer slot is filled by echoed demonstration questions such as \emph{What is the capital of Zanmir?} EHR declines over training ($\rho=\resRhoEHRStep{}$) because the model stops producing answers of any kind, not because it learns when to withhold them.
+
+A prompt-format pilot at one asserting and one abstaining checkpoint confirms the mechanism (Appendix~\ref{app:prompts}). At step $200{,}000$ all four formats yield an echoed question on every item. At step $658{,}032$ the output copies the last demonstration's answer: \texttt{Unknown} under the default prompt, and a city name when the last demonstration is factual. No format exceeds a selectivity of $0.025$. Whether a checkpoint abstains or answers is therefore decided by where its in-context copying \citep{olsson2022induction} lands, which depends on the prompt, not on the question.
+
+\subsection{Confidence marks the regime, not the pair}
+
+Mean answerable entropy is \resEntropyFirst{} nats at the first checkpoint and \resEntropyLast{} at the last, and in between it follows the regime. Abstaining checkpoints come in two kinds: high-entropy ones ($H$ 5.6--6.4, ECE 0.15--0.28) and collapsed ones at steps 400k, 520k, 550k and 610k ($H\le 2.4$, ECE $\ge 0.72$), where the model is nearly certain of \texttt{Unknown}. Unanswerable entropy tracks answerable entropy instead of exceeding it.
+
+At the last checkpoint, confidence is \resConfAnsLast{} on answerable questions and \resConfUnLast{} on their twins, a paired difference of $\resPairedDeltaLast{}$ (permutation $p=\resPairedPLast{}$, 80 pairs). The model is more confident on the twin that has no answer; a model that knew what it did not know would show the opposite sign \citep{kadavath2022know,yin2023unknown}.
+
+ECE peaks at \resECEMax{} at the collapsed step~\resECEMaxStep{}. Averaged over checkpoints it is \resECESubMean{} under substring matching and \resECEJointMean{} when a correct abstention counts as correct. Pair AUROC averages \resAUROCPairMean{} and ends at \resAUROCPairLast{}, at or below chance, and hallucination-detection AUROC averages \resAUROCDetectMean{}. Lower gold NLL does not translate into better abstention.
+
+\section{Discussion}
+
+\subsection{What the errors are}
+\label{sec:errors}
+
+We labelled all \resErrorNHallucinated{} hallucinated unanswerable completions with a rule-based classifier (Appendix~\ref{app:errors}). A false claim is a short named-entity answer, such as \emph{Jane Austen} as the mother of a U.S. state. A topic shift is an echoed question, boilerplate text, a continuation, or a restatement of the subject. \resErrorNTopicShift{} errors (\resErrorTopicShiftShare{}) are topic shifts and \resErrorNFalseClaim{} (\resErrorFalseClaimShare{}) are false claims, and topic shifts dominate every answering checkpoint (Figure~\ref{fig:errors}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{../plots/fig8_error_types.pdf}
+\caption{Share of unanswerable prompts labelled false claims (including quoted echoes) and topic shifts across training.}
+\label{fig:errors}
+\end{figure}
+
+The false-claim share is an upper bound. Manual inspection showed that 57 of the \resErrorNFalseClaim{} are demonstration questions in quotation marks (\texttt{"What is the capital of France?"}), which the echo detector misses. The clearest real fabrications are 28 copies of the demonstration answer \emph{Jane Austen} into parent, birthplace and occupation slots, and even these come from the prompt rather than from knowledge about the query. Category errors are not recognised as such: a U.S. state in a parent relation receives a demonstration name, a follow-up question, or \texttt{Unknown}, exactly like an ordinary PopQA question. The model learns the local answer format before it learns the facts, and that format copying is what looks like hallucination on an unanswerable twin.
+
+\subsection{Why selective abstention does not emerge}
+
+One explanation is scale. LMEnt's own PopQA results become informative only at larger model sizes \citep{gottesman2025lment}, and selective abstention requires question-conditioned answering, which this model lacks. Another explanation is the training objective: next-token prediction on well-formed text rewards asserting, not withholding \citep{gekhman2024finetune}, which leaves \texttt{Unknown} as an output the context can switch on or off. The present results cannot separate the two explanations; a sweep over LMEnt model sizes would.
+
+Either way, the results suggest a reporting practice for hallucination studies on base models. A hallucination rate should be reported with the paired answerable rate, an onset step along training, and at least one alternative prompt format. Analyses of when knowledge is acquired \citep{chang2024dynamics} should be paired with an analysis of when the model decides to answer.
+
+\section{Conclusion}
+
+We tracked two abilities across pre-training: storing a fact and refraining from inventing one. A \resModelParams{}M LMEnt model improves steadily on the first, measured by gold-answer likelihood, while its greedy output never becomes selective. Hallucination sets in at step~\resOnsetStep{}, and afterwards the model switches between answering everything and abstaining on everything, in both cases by copying the demonstrations. Mitigations such as retrieval \citep{lewis2020rag} therefore target a behavior that, at this scale, is present as soon as the model produces well-formed text. Natural next steps are larger LMEnt models and tracing individual facts back to their pre-training mentions.
+
+\section*{Limitations}
+
+The model is small, the generation budget is short, and the sample is modest (300 pairs at 19 checkpoints and 80 at five, with a different draw of twins), so intermediate rates carry wide intervals. We report greedy decoding only; sampling with several seeds would show more varied fabrications. The abstention, echo and error-category detectors are surface heuristics, so the error categories are upper bounds that we checked by hand on a sample. Entity-swap unanswerability is linguistic rather than absolute: a stronger model could invent a fictional reading in which a mountain has a screenwriter. A ten-bin ECE on 80--300 questions is noisy, and the reliability diagrams in Appendix~\ref{app:full} are more informative than the single number.
+
+\section*{AI Disclosure and Reflection}
+
+We used Cursor with Anthropic's Claude models. For engineering, the assistant helped write the data, evaluation and plotting code, debug the Slurm and Hugging Face setup, and install a portable \LaTeX{} engine. For writing, it drafted sections from our notes and the generated tables and checked quoted numbers against the logs. We chose the research question, the paired design, the metrics and the onset rule, reviewed all generated code and text, and read the saved generations ourselves before making any claim.
+
+The main risk was confident over-claiming. A draft based on the broad hallucination rate alone described every answering checkpoint as fabricating entities, but the saved generations showed mostly echoed questions, and the prompt pilot showed that abstention was copying. The entity-level rate, the echo detector, the pilot and the audit of the false-claim labels exist because the logs contradicted the prose. Every number in the paper is a macro generated from the logs, and we take responsibility for any remaining errors.
+
+\bibliography{custom}
+
+\appendix
+
+\section{Prompt and Format Pilot}
+\label{app:prompts}
+
+Figure~\ref{fig:prompt} shows the default \texttt{abstain\_fewshot} prompt used at every checkpoint. Its six demonstrations are disjoint from the evaluation questions, and only the first generated line is scored.
+
+\begin{figure*}[t]
+\centering
+\begin{minipage}{0.92\textwidth}
+\small
+\begin{verbatim}
+Answer each question with a short factual answer.
+If the question cannot be answered, write "Unknown".
+
+Question: What is the capital of France?
+Answer: Paris
+
+Question: Who is the director of Brenvik Passage?
+Answer: Unknown
+
+Question: What is the occupation of Marie Curie?
+Answer: Physicist
+
+Question: In what city was that person born?
+Answer: Unknown
+
+Question: Who wrote the novel Pride and Prejudice?
+Answer: Jane Austen
+
+Question: What is the capital of Zanmir?
+Answer: Unknown
+
+Question: <evaluated question>
+Answer:
+\end{verbatim}
+\end{minipage}
+\caption{The default \texttt{abstain\_fewshot} prompt. The last demonstration is an abstention.}
+\label{fig:prompt}
+\end{figure*}
+
+The format pilot ran at an asserting checkpoint (200k) and an abstaining checkpoint (658{,}032) on 40 answerable questions and their twins. The four formats differ only in the demonstrations:
+\begin{itemize}
+\item \textbf{3 factual $+$ 3 abstain (default):} Figure~\ref{fig:prompt}; the last demonstration is an abstention.
+\item \textbf{4 factual, no abstention:} the \texttt{Unknown} instruction is dropped and the demonstrations are four factual pairs (France/Paris, Marie Curie/Physicist, Pride and Prejudice/Jane Austen, The Blue Danube/Waltz).
+\item \textbf{4 factual $+$ 2 abstain, factual last:} the default demonstrations reordered so that the last one is factual.
+\item \textbf{5 factual $+$ 1 abstain, factual last:} a single abstention early in the block.
+\end{itemize}
+A useful format would raise abstention on twins more than on originals, so formats are compared by selectivity. Table~\ref{tab:pilot} shows that none reaches $0.03$.
+
+\begin{table*}[t]
+\centering
+\small
+\input{tables/prompt_pilot}
+\caption{Prompt-format pilot ($n=40$ per split). At step $658{,}032$ the default prompt yields blanket abstention and the factual-last prompts yield blanket assertion.}
+\label{tab:pilot}
+\end{table*}
+
+\section{Full Checkpoint Results}
+\label{app:full}
+
+Table~\ref{tab:main-full} lists all \resNumCheckpoints{} checkpoints, including mean token entropy, and Table~\ref{tab:cal} the full calibration results. Figure~\ref{fig:reliability} shows reliability diagrams, Figure~\ref{fig:cal-auroc} plots ECE, AUROC and confidence across training, and Table~\ref{tab:popularity} breaks results down by subject popularity.
+
+\begin{table}[h]
+\centering
+\resizebox{\columnwidth}{!}{%
+\input{tables/popularity_results}
+}
+\caption{Exact match and gold-answer NLL by subject popularity at the checkpoints of Table~\ref{tab:main}. Exact match is at floor in every stratum, so the popularity effect appears only in the likelihood.}
+\label{tab:popularity}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\scriptsize
+\resizebox{\textwidth}{!}{%
+\input{tables/main_results_full}
+}
+\caption{All \resNumCheckpoints{} checkpoints (columns as in Table~\ref{tab:main}). Steps 40k, 100k, 200k, 400k and 658{,}032 use the 80-pair subset; all other rows use the 300-pair set.}
+\label{tab:main-full}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\scriptsize
+\resizebox{\textwidth}{!}{%
+\input{tables/calibration_results_full}
+}
+\caption{ECE under three correctness targets, Brier score, AUROC of confidence (substring, joint, pair, hallucination detection), and mean confidence per split, at every checkpoint. AUROC is undefined (\texttt{--}) when a checkpoint has no positive class.}
+\label{tab:cal}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{../plots/fig3_reliability.pdf}
+\caption{Reliability diagrams at representative checkpoints (joint scoring, where a correct unanswerable outcome is abstention). Hatched regions are the per-bin contribution to ECE; the dashed line is perfect calibration.}
+\label{fig:reliability}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{../plots/fig7_calibration_auroc.pdf}
+\caption{(a)~ECE under exact-match, substring and joint targets. (b)~AUROC of confidence for pair separation, hallucination detection, joint and substring correctness (dashed line $=0.5$). (c)~Mean confidence on answerable and unanswerable prompts.}
+\label{fig:cal-auroc}
+\end{figure*}
+
+\section{Error Analysis Details}
+\label{app:errors}
+
+A hallucinated completion is a \emph{topic shift} if it is a question echo, starts with a boilerplate opener (\emph{The city of}, \emph{The question:}, \ldots), continues a sentence, or is longer than eight tokens. Otherwise, a short capitalised string or a name-like pattern is a \emph{false claim}. Quotation marks are stripped before the length test but not before the echo test, which is why quoted echoes are counted as false claims (Section~\ref{sec:errors}). Table~\ref{tab:errors} gives a stratified sample of \resErrorSampleN{} labelled errors.
+
+\begin{table*}[t]
+\centering
+\scriptsize
+\resizebox{\textwidth}{!}{%
+\input{tables/error_analysis}
+}
+\caption{Stratified sample of \resErrorSampleN{} unanswerable errors with their rule-based labels; the target is \texttt{Unknown} in every row. Of the six ``false claims'', only the two \emph{Jane Austen} rows are real fabrications; the other four are quoted echoes or restatements of the subject.}
+\label{tab:errors}
+\end{table*}
+
+\section{Data and Metric Details}
+\label{app:details}
+
+\paragraph{Data.}
+The answerable sample keeps PopQA questions whose subject appears verbatim in the question, stratified by relation. The 80-question subset is drawn with the same seed and is contained in the 300-question set. Monthly Wikipedia pageviews bucket questions into tail, torso and head strata (Table~\ref{tab:popularity}). Twins cycle deterministically through the three perturbations (100 each in the full set; 26, 27 and 27 in the subset). Type-violating swaps draw a real entity of an incompatible type from the sample itself, so the subset's twins overlap only partly with those of the full set. Fictitious names are rejected if they match any gold answer, so no twin is accidentally answerable. Context-deprived twins use \emph{this person}, \emph{that work} or \emph{that place} according to the relation. The 120 TruthfulQA questions (32 in the subset) are used unmodified.
+
+\paragraph{Lexical accuracy and hallucination.}
+Exact match and token $F_1$ use SQuAD normalisation \citep{rajpurkar2016squad}; substring match is 1 if the normalised gold alias occurs in the normalised generation. A completion is contentful if it contains an alphanumeric token, and an abstention if it matches a pattern covering \texttt{Unknown}, \texttt{I don't know}, insufficient-context paraphrases, and empty strings. HR is the mean of ``contentful and not an abstention''; EHR additionally requires that the completion is not a question echo.
+
+\paragraph{Confidence and calibration.}
+For each answer token $t$ we store $\log p_\theta(t\mid\text{prefix})$ and the entropy of the next-token distribution. Sequence confidence is $\exp\bigl(\tfrac{1}{T}\sum_t \log p_\theta(t)\bigr)$, which does not shrink with answer length. With $B=10$ equal-width bins,
+\[
+\mathrm{ECE} = \sum_{b=1}^{B} \frac{|B_b|}{N}\bigl|\mathrm{acc}(B_b)-\mathrm{conf}(B_b)\bigr|.
+\]
+ECE is computed on answerable questions under exact match, substring match and $F_1>0.5$, and jointly over both splits with a correct abstention counted as correct. Pair AUROC asks whether confidence separates originals from twins; hallucination-detection AUROC asks whether low confidence flags a fabrication. The paired permutation test compares confidence on matched originals and twins at the final checkpoint.
+
+\end{document}

@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/setup_hf.py", line 329, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/setup_hf.py", line 322, in main
+    report = run_all(skip_weights=args.skip_weights)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/setup_hf.py", line 295, in run_all
+    "environment": device_report(),
+                   ^^^^^^^^^^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/utils.py", line 187, in device_report
+    import torch
+ModuleNotFoundError: No module named 'torch'

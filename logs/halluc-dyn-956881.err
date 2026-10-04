@@ -1,0 +1,140 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Repo card metadata block was not found. Setting CardData to empty.
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights:   2%|▏         | 3/148 [00:00<00:06, 23.88it/s]Loading weights:   4%|▍         | 6/148 [00:00<00:19,  7.46it/s]Loading weights:   7%|▋         | 11/148 [00:00<00:09, 13.87it/s]Loading weights:  14%|█▍        | 21/148 [00:00<00:04, 29.63it/s]Loading weights:  28%|██▊       | 42/148 [00:01<00:01, 61.47it/s]Loading weights:  41%|████      | 61/148 [00:01<00:01, 85.99it/s]Loading weights:  68%|██████▊   | 101/148 [00:01<00:00, 147.57it/s]Loading weights:  82%|████████▏ | 121/148 [00:01<00:00, 133.50it/s]Loading weights: 100%|██████████| 148/148 [00:01<00:00, 90.30it/s] 
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/113 [00:00<?, ?it/s]Loading weights:   2%|▏         | 2/113 [00:00<00:15,  7.35it/s]Loading weights:  10%|▉         | 11/113 [00:00<00:02, 34.28it/s]Loading weights:  24%|██▍       | 27/113 [00:00<00:01, 65.70it/s]Loading weights:  38%|███▊      | 43/113 [00:00<00:00, 83.76it/s]Loading weights:  47%|████▋     | 53/113 [00:00<00:00, 76.31it/s]Loading weights:  55%|█████▍    | 62/113 [00:01<00:00, 62.82it/s]Loading weights:  65%|██████▌   | 74/113 [00:01<00:00, 72.33it/s]Loading weights:  73%|███████▎  | 82/113 [00:01<00:00, 65.91it/s]Loading weights:  83%|████████▎ | 94/113 [00:01<00:00, 76.13it/s]Loading weights: 100%|██████████| 113/113 [00:01<00:00, 75.70it/s]
+/home/morg/NLP_2526b/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/backends/nvidia/driver.c:9:10: fatal error: Python.h: No such file or directory
+    9 | #include <Python.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+Traceback (most recent call last):
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/evaluator.py", line 911, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/evaluator.py", line 905, in main
+    paths = run_sweep(args.model, checkpoints, cfg, args.output_dir, overwrite=args.overwrite)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/evaluator.py", line 799, in run_sweep
+    report = evaluate_checkpoint(step_cfg, examples)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/evaluator.py", line 533, in evaluate_checkpoint
+    gen = _run_adaptive(
+          ^^^^^^^^^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/evaluator.py", line 460, in _run_adaptive
+    results.extend(fn(batch))
+                   ^^^^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/evaluator.py", line 534, in <lambda>
+    lambda batch: _generate_batch(model, tokenizer, batch, device, cfg),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/specific/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/src/evaluator.py", line 326, in _generate_batch
+    out = model.generate(
+          ^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/generation/utils.py", line 2976, in generate
+    result = decoding_method(
+             ^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/generation/utils.py", line 3176, in _sample
+    outputs = self._prefill(
+              ^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/generation/utils.py", line 4287, in _prefill
+    return self(**model_inputs, return_dict=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 939, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/models/olmo2/modeling_olmo2.py", line 466, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+                                       ^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 1068, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 287, in wrapper
+    outputs = func(self, *args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/models/olmo2/modeling_olmo2.py", line 399, in forward
+    position_embeddings = self.rotary_emb(hidden_states, position_ids=position_ids)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/modeling_rope_utils.py", line 128, in wrapper
+    return rope_forward(self, x, position_ids, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/transformers/models/olmo2/modeling_olmo2.py", line 117, in forward
+    freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/_native/registry.py", line 956, in eager_router
+    result = _dispatch(args, kwargs, swallow_cond_exceptions=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/_native/registry.py", line 935, in _dispatch
+    return getattr(torch.ops._native, impl_name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1350, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/_native/ops/bmm_outer_product/triton_impl.py", line 27, in _bmm_outer_product_impl
+    return bmm_outer_product(a, b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/_native/ops/bmm_outer_product/triton_kernels.py", line 87, in bmm_outer_product
+    _bmm_outer_product_kernel[(B * triton.cdiv(M, BLOCK_M) * triton.cdiv(N, BLOCK_N),)](
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/torch/_native/instrumentation.py", line 208, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/jit.py", line 374, in <lambda>
+    return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/jit.py", line 731, in run
+    device = driver.active.get_current_device()
+             ^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/driver.py", line 39, in active
+    self._active = self.default
+                   ^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/driver.py", line 33, in default
+    self._default = _create_driver()
+                    ^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/driver.py", line 21, in _create_driver
+    return active_drivers[0]()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/backends/nvidia/driver.py", line 342, in __init__
+    self.utils = CudaUtils()  # TODO: make static
+                 ^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/backends/nvidia/driver.py", line 101, in __init__
+    mod = compile_module_from_file(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/build.py", line 196, in compile_module_from_file
+    return _compile_so_from_file(src_path, name, library_dirs, include_dirs, libraries, ccflags, load_module=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/build.py", line 165, in _compile_so_from_file
+    return _compile_so(src=src, src_path=src_path, name=name, library_dirs=library_dirs, include_dirs=include_dirs,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/build.py", line 149, in _compile_so
+    so = _build(name, src_path, tmpdir, library_dirs or [], include_dirs or [], libraries or [], ccflags or [],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/a/home/cc/students/cs/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/runtime/build.py", line 83, in _build
+    subprocess.check_call(cc_cmd, stdout=subprocess.DEVNULL)
+  File "/usr/lib/python3.12/subprocess.py", line 413, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['/usr/bin/gcc', '/home/morg/NLP_2526b/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/backends/nvidia/driver.c', '-O3', '-shared', '-fPIC', '-Wno-psabi', '-o', '/tmp/tmptmsa4hpz/cuda_utils.cpython-312-x86_64-linux-gnu.so', '-l:libcuda.so.1', '-L/home/morg/NLP_2526b/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/backends/nvidia/lib', '-L/lib/x86_64-linux-gnu', '-I/home/morg/NLP_2526b/jameelnajjar/hallucination_dynamics/.venv/lib/python3.12/site-packages/triton/backends/nvidia/include', '-I/tmp/tmptmsa4hpz', '-I/usr/include/python3.12']' returned non-zero exit status 1.

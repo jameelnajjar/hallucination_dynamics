@@ -1,0 +1,16 @@
+# Environment and caches (the venv lives on course storage and is recreated by scripts/setup_env.sh)
+.venv
+.env
+.cache/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# LaTeX build intermediates (PDFs are kept)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.tectonic.out
+*.synctex.gz
